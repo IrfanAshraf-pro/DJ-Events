@@ -1,14 +1,28 @@
-import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
+import EventItem from "@/components/EventItem";
 import Link from "next/link";
 import Layout from "@/components/Layout";
-export default function HomePage() {
+import { API_URL } from "@/config/index";
+export default function HomePage({ events }) {
   return (
     <Layout>
-      <h1>Home Page</h1>
-      <Link href="/about">About</Link>
+      <h1>Upcoming Events</h1>
+      {events.length === 0 && <h3>No Events To Show</h3>}
+      {events.map((evt) => (
+        <EventItem evt={evt} key={evt.id} />
+      ))}
+      {
+        events.length>0 && (<Link href='/events' className="btn-secondary"
+        >View All Events</Link>)
+      }
     </Layout>
   );
+}
+
+export async function getStaticProps() {
+  const res = await fetch(`${API_URL}/api/events`);
+  const events = await res.json();
+  return {
+    props: { events },
+    revalidate: 1,
+  };
 }
